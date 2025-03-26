@@ -19,4 +19,7 @@ public class MultiModalMessage {
   // TODO maybe a abstract or interface for content instead of map, now not user friendly for
   // developers
   private List<Map<String, Object>> content;
+
+  /** chain of thought content */
+  String reasoningContent;
 }
