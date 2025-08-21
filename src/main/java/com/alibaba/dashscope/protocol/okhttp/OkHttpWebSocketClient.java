@@ -39,6 +39,7 @@ public class OkHttpWebSocketClient extends WebSocketListener
   private WebSocket webSocketClient;
   // indicate the websocket connection is established.
   private AtomicBoolean isOpen = new AtomicBoolean(false);
+  private AtomicBoolean isClosed = new AtomicBoolean(false);
   // indicate the first response is received.
   private AtomicBoolean isFirstMessage = new AtomicBoolean(false);
   // used for get request response
@@ -80,6 +81,7 @@ public class OkHttpWebSocketClient extends WebSocketListener
      * close websocket connection see.
      * https://square.github.io/okhttp/3.x/okhttp/okhttp3/WebSocket.html
      */
+    isClosed.set(true);
     if (webSocketClient != null) {
       return webSocketClient.close(code, reason);
     } else {
@@ -194,6 +196,12 @@ public class OkHttpWebSocketClient extends WebSocketListener
     // Both outgoing and incoming messages may have been lost. No further calls to
     // this listener will be made.
 
+    if (isClosed.get()) {
+      log.debug("called close before but not working, close again in onFailure.");
+      close(1013, "call closed before");
+      return;
+    }
+
     String responseBody = "";
     // Get response body if there is.
     if (response != null) {
@@ -221,6 +229,11 @@ public class OkHttpWebSocketClient extends WebSocketListener
 
   @Override
   public void onMessage(WebSocket webSocket, String text) {
+    if (isClosed.get()) {
+      log.debug("called close before but not working, close again in onMessage.");
+      close(1013, "call closed before");
+      return;
+    }
     log.debug(text);
     // Invoked when a text (type 0x1) message has been received.
     if (!isFirstMessage.get()) {
@@ -314,6 +327,11 @@ public class OkHttpWebSocketClient extends WebSocketListener
   @Override
   public void onMessage(WebSocket webSocket, ByteString bytes) {
     // Invoked when a binary (type 0x2) message has been received.
+    if (isClosed.get()) {
+      log.debug("called close before but not working, close again in onMessage.");
+      close(1013, "call closed before");
+      return;
+    }
     if (!isFirstMessage.get()) {
       log.debug("Receive first binary package.");
       isFirstMessage.set(true);
@@ -333,6 +351,11 @@ public class OkHttpWebSocketClient extends WebSocketListener
     // Invoked when a web socket has been accepted by the remote peer and may begin
     // transmitting
     // messages..
+    if (isClosed.get()) {
+      log.debug("called close before but not working, close again in onOpen.");
+      close(1013, "call closed before");
+      return;
+    }
     isOpen.set(true);
     if (connectionEmitter != null && !connectionEmitter.isCancelled()) {
       connectionEmitter.onComplete();
