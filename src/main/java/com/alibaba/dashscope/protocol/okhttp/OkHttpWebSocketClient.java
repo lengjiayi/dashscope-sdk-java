@@ -159,6 +159,7 @@ public class OkHttpWebSocketClient extends WebSocketListener
     // listener will be made.
     log.debug(String.format("WebSocket %s closed: %d, %s", webSocket.toString(), code, reason));
     isOpen.set(false);
+    isClosed.set(false);
   }
 
   @Override
