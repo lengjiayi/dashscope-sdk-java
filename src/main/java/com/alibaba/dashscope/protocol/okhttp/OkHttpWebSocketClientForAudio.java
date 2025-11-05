@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author songsong.shao
- * @date 2025/11/5
  */
 @Slf4j
 public class OkHttpWebSocketClientForAudio extends OkHttpWebSocketClient {
